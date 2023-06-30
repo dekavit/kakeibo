@@ -1,6 +1,15 @@
 <script>
-  let formName, formVal;
-  let items = [];
+  import { loop_guard } from "svelte/internal"
+  import { spring, tweened } from "svelte/motion"
+  import Pie from "./Pie.svelte"
+
+  let formName, formVal
+  let items = []
+  let percent = 0
+  let maxMoney = 100000
+  let sumMoney = 0
+  const store = tweened(0, { duration: 400 })
+  $: store.set(percent)
 </script>
 
 <head>
@@ -12,8 +21,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
     href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@100;300;900&display=swap"
-    rel="stylesheet"
-  />
+    rel="stylesheet" />
 </head>
 
 <main>
@@ -26,11 +34,9 @@
       <div>
         <h2>メニュー</h2>
         <button type="“button”" onclick="location.href='syuusi.html'"
-          >収支</button
-        >
+          >収支</button>
         <button type="“button”" onclick="location.href='tyokin.html'"
-          >貯金</button
-        >
+          >貯金</button>
         <br /><br /><br />
 
         <h2>カレンダー</h2>
@@ -42,8 +48,7 @@
             width="500"
             height="400"
             frameborder="0"
-            scrolling="no"
-          />
+            scrolling="no" />
         </div>
       </div>
 
@@ -60,39 +65,50 @@
           <tr>
             <td>{i}</td>
             <td contenteditable="true">{name}</td>
-            <td contenteditable="true">{val}</td>
+            <td id="editor" contenteditable="true">{val}</td>
             <td>
               <button
                 class="deleteButton"
                 on:click={() => {
-                  items = items.slice(0, i).concat(items.slice(i + 1));
-                }}>🔥</button
-              >
+                  items = items.slice(0, i).concat(items.slice(i + 1))
+                  sumMoney = items.reduce((a, b) => a + b[1], 0)
+                  $: store.set((sumMoney / maxMoney) * 100)
+                }}>🔥</button>
             </td>
           </tr>
         {/each}
         <tr style="">
           <th colspan="2">計</th>
-          <td>{items.reduce((a, b) => a + b[1], 0)}</td>
+          <td>{sumMoney}</td>
           <td />
         </tr>
       </table>
+
+      <!-- <script>
+        editor.addEventListener("charge", function () {
+          console.log("aaa")
+        })
+      </script> -->
 
       <br />
       <form
         on:submit|preventDefault={() => {
           if (!formName || !formVal) {
-            alert("有効な値を入れてください。💩");
-            return;
+            alert("有効な値を入れてください。💩")
+            return
           }
-          items = [...items, [formName, formVal]];
-          formName = formVal = null;
-        }}
-      >
+          items = [...items, [formName, formVal]]
+          sumMoney = items.reduce((a, b) => a + b[1], 0)
+          formName = formVal = null
+          console.log(sumMoney)
+          $: store.set((sumMoney / maxMoney) * 100)
+        }}>
         <input placeholder="項目名" bind:value={formName} />
         <input type="number" placeholder="金額を入力" bind:value={formVal} />
         <button type="submit">品目の追加</button>
       </form>
+
+      <Pie size={200} percent={$store} />
 
       <div>
         <h2>シェア</h2>
@@ -100,8 +116,7 @@
         <a
           href="http://twitter.com/share?url=yurukei-career.com&text=Twitterのシェアをするときの文章です&via=yurukei20&hashtags=ハッシュタグのテキスト"
           target="_blank"
-          rel="nofollow noopener noreferrer">Twitterで共有する</a
-        >
+          rel="nofollow noopener noreferrer">Twitterで共有する</a>
         <br /><br /><br />
         <h2>フレンド</h2>
         <br /><br /><br /><br />
@@ -109,11 +124,8 @@
         <button
           type="button"
           onclick="location.href='https://game-i.daa.jp/?AppStore%E3%82%A2%E3%83%97%E3%83%AA%E6%9C%80%E6%96%B0%E3%82%BB%E3%83%BC%E3%83%AB%E3%82%B9%E3%83%A9%E3%83%B3%E3%82%AD%E3%83%B3%E3%82%B0'"
-          >チェック</button
-        >
-        <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br
-        /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br
-        />
+          >チェック</button>
+        <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
       </div>
     </div>
   </body>
@@ -127,12 +139,12 @@
     margin: 0 auto;
   }
 
-  h1 {
+  /* h1 {
     color: #ff3e00;
     text-transform: uppercase;
     font-size: 4em;
     font-weight: 100;
-  }
+  } */
 
   .deleteButton {
     border: 0;
