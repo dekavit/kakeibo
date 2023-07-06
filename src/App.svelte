@@ -1,5 +1,5 @@
 <script>
-  import { loop_guard } from "svelte/internal"
+  import { loop_guard, text } from "svelte/internal"
   import { spring, tweened } from "svelte/motion"
   import Pie from "./Pie.svelte"
 
@@ -10,6 +10,23 @@
   let sumMoney = 0
   const store = tweened(0, { duration: 400 })
   $: store.set(percent)
+
+  let questions = [
+    { id: 0, text: "" },
+    { id: 1, text: `ゲーム` },
+    { id: 2, text: `食費` },
+    { id: 3, text: `その他` },
+  ]
+
+  let selected = null
+
+  let answer = ""
+
+  function handleSubmit() {
+    alert(
+      `answered question ${selected.id} (${selected.text}) with "${answer}"`
+    )
+  }
 </script>
 
 <head>
@@ -52,64 +69,6 @@
         </div>
       </div>
 
-      <h2>編集</h2>
-
-      <table id="table_edit" align="center" width="500">
-        <tr>
-          <td>番号</td>
-          <td>品目名</td>
-          <td>金額(単位 円)</td>
-          <td>削除</td>
-        </tr>
-        {#each items as [name, val], i}
-          <tr>
-            <td>{i}</td>
-            <td contenteditable="true">{name}</td>
-            <td id="editor" contenteditable="true">{val}</td>
-            <td>
-              <button
-                class="deleteButton"
-                on:click={() => {
-                  items = items.slice(0, i).concat(items.slice(i + 1))
-                  sumMoney = items.reduce((a, b) => a + b[1], 0)
-                  $: store.set((sumMoney / maxMoney) * 100)
-                }}>🔥</button>
-            </td>
-          </tr>
-        {/each}
-        <tr style="">
-          <th colspan="2">計</th>
-          <td>{sumMoney}</td>
-          <td />
-        </tr>
-      </table>
-
-      <!-- <script>
-        editor.addEventListener("charge", function () {
-          console.log("aaa")
-        })
-      </script> -->
-
-      <br />
-      <form
-        on:submit|preventDefault={() => {
-          if (!formName || !formVal) {
-            alert("有効な値を入れてください。💩")
-            return
-          }
-          items = [...items, [formName, formVal]]
-          sumMoney = items.reduce((a, b) => a + b[1], 0)
-          formName = formVal = null
-          console.log(sumMoney)
-          $: store.set((sumMoney / maxMoney) * 100)
-        }}>
-        <input placeholder="項目名" bind:value={formName} />
-        <input type="number" placeholder="金額を入力" bind:value={formVal} />
-        <button type="submit">品目の追加</button>
-      </form>
-
-      <Pie size={200} percent={$store} />
-
       <div>
         <h2>シェア</h2>
         <!-- twitter -->
@@ -128,29 +87,166 @@
         <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
       </div>
     </div>
+
+    <h2>編集</h2>
+
+    <table id="table_edit" align="center" width="500">
+      <tr>
+        <td>番号</td>
+        <td>品目名</td>
+        <td>金額(単位 円)</td>
+        <td>タグ </td>
+        <td>削除</td>
+      </tr>
+      {#each items as [name, val, tag], i}
+        <tr>
+          <td>{i}</td>
+          <td contenteditable="true">{name}</td>
+          <td id="editor" contenteditable="true">{val}</td>
+          <td>{questions[tag].text}</td>
+          <td>
+            <button
+              class="deleteButton"
+              on:click={() => {
+                items = items.slice(0, i).concat(items.slice(i + 1))
+                sumMoney = items.reduce((a, b) => a + b[1], 0)
+                $: store.set((sumMoney / maxMoney) * 100)
+              }}>🔥</button>
+          </td>
+        </tr>
+      {/each}
+      <tr style="">
+        <th colspan="2">計</th>
+        <td>{sumMoney}</td>
+        <td />
+      </tr>
+    </table>
+
+    <script>
+      editor.addEventListener("charge", function () {
+        console.log("aaa")
+      })
+    </script>
+
+    <br />
+    <form
+      on:submit|preventDefault={() => {
+        if (!formName || !formVal) {
+          alert("有効な値を入れてください。💩")
+          return
+        }
+        items = [...items, [formName, formVal, selected ? selected.id : 0]]
+        sumMoney = items.reduce((a, b) => a + b[1], 0)
+        formName = formVal = selected = null
+        $: store.set((sumMoney / maxMoney) * 100)
+      }}>
+      <input placeholder="項目名" bind:value={formName} />
+      <input type="number" placeholder="金額を入力" bind:value={formVal} />
+      <select bind:value={selected} on:change={() => (answer = "")}>
+        {#each questions as question}
+          <option value={question}>
+            {question.text}
+          </option>
+        {/each}
+      </select>
+      <button type="submit">品目の追加</button>
+    </form>
+
+    <Pie size={200} percent={$store} />
   </body>
 </main>
 
 <style>
-  main {
+  /* main {
     text-align: center;
     padding: 1em;
     max-width: 240px;
     margin: 0 auto;
-  }
-
-  /* h1 {
-    color: #ff3e00;
-    text-transform: uppercase;
-    font-size: 4em;
-    font-weight: 100;
   } */
 
+  /*///////////////////*/
+  * {
+    font-family: "M PLUS Rounded 1c", sans-serif;
+  }
+
+  header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: #ffffff;
+    box-sizing: border-box;
+  }
+
+  h1 {
+    text-align: center; /* テキストを中央揃えに */
+    font-size: 3em;
+    background-color: #ffb6c1;
+  }
+
+  h2 {
+    text-align: center;
+    font-size: 2em;
+    color: #c71585;
+  }
+  h3 {
+    text-align: center; /* テキストを中央揃えに */
+    font-size: 3em;
+    color: #c71585;
+  }
+
+  .unko {
+    padding-top: 150px;
+    display: flex;
+    text-align: center; /* テキストを中央揃えに */
+    animation: fadein 3s forwards;
+  }
+  @keyframes fadein {
+    0% {
+      opacity: 0;
+    }
+
+    100% {
+      opacity: 1;
+    }
+  }
+  .unko > div {
+    width: 50%;
+    text-align: center; /* テキストを中央揃えに */
+  }
+
+  button {
+    min-width: 100px;
+    font-family: "M PLUS Rounded 1c", sans-serif;
+    appearance: none;
+    border: 1;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #000000;
+    padding: 8px 16px;
+    font-size: 20px;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background: #b3b3b3;
+  }
+
+  button:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #cbcbcb;
+  }
+
+  .googleCalendar iframe {
+    width: 75%;
+    height: 400px;
+  }
+  /*///////////////////*/
   .deleteButton {
     border: 0;
     background: yellow; /* 後でスタイルいじる */
   }
-
+  /* 
   @media (min-width: 640px) {
     main {
       max-width: none;
@@ -161,5 +257,5 @@
   }
   #table_edit td {
     border: 1px solid lightgray;
-  }
+  } */
 </style>
