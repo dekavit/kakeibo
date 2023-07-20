@@ -1,32 +1,27 @@
 <script>
-  import { loop_guard, text } from "svelte/internal"
-  import { spring, tweened } from "svelte/motion"
-  import Pie from "./Pie.svelte"
+  //   import { loop_guard, text } from "svelte/internal";
+  import { spring, tweened } from "svelte/motion";
+  import Pie from "../Pie.svelte";
 
-  let formName, formVal
-  let items = []
-  let percent = 0
-  let maxMoney = 100000
-  let sumMoney = 0
-  const store = tweened(0, { duration: 400 })
-  $: store.set(percent)
+  let formName = "";
+  let formVal = 0;
+  let items = [];
+  let percent = 0;
+  let maxMoney = 100000;
+  let sumMoney = 0;
+  const store = tweened(0, { duration: 400 });
+  $: store.set(percent);
 
   let questions = [
     { id: 0, text: "" },
     { id: 1, text: `ゲーム` },
     { id: 2, text: `食費` },
     { id: 3, text: `その他` },
-  ]
+  ];
 
-  let selected = null
+  let selected = null;
 
-  let answer = ""
-
-  function handleSubmit() {
-    alert(
-      `answered question ${selected.id} (${selected.text}) with "${answer}"`
-    )
-  }
+  let answer = "";
 </script>
 
 <head>
@@ -38,7 +33,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
     href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@100;300;900&display=swap"
-    rel="stylesheet" />
+    rel="stylesheet"
+  />
 </head>
 
 <main>
@@ -50,10 +46,8 @@
     <div class="unko">
       <div>
         <h2>メニュー</h2>
-        <button type="“button”" onclick="location.href='syuusi.html'"
-          >収支</button>
-        <button type="“button”" onclick="location.href='tyokin.html'"
-          >貯金</button>
+        <a href="/shisyutsu"><button type="button">収支</button></a>
+        <button type="button">貯金</button>
         <br /><br /><br />
 
         <h2>カレンダー</h2>
@@ -65,7 +59,8 @@
             width="500"
             height="400"
             frameborder="0"
-            scrolling="no" />
+            scrolling="no"
+          />
         </div>
       </div>
 
@@ -75,19 +70,22 @@
         <a
           href="http://twitter.com/share?url=yurukei-career.com&text=Twitterのシェアをするときの文章です&via=yurukei20&hashtags=ハッシュタグのテキスト"
           target="_blank"
-          rel="nofollow noopener noreferrer">Twitterで共有する</a>
+          rel="nofollow noopener noreferrer">Twitterで共有する</a
+        >
         <br /><br /><br />
         <h2>フレンド</h2>
         <br /><br /><br /><br />
         <h3>現在のセルラン相場</h3>
-        <button
-          type="button"
-          onclick="location.href='https://game-i.daa.jp/?AppStore%E3%82%A2%E3%83%97%E3%83%AA%E6%9C%80%E6%96%B0%E3%82%BB%E3%83%BC%E3%83%AB%E3%82%B9%E3%83%A9%E3%83%B3%E3%82%AD%E3%83%B3%E3%82%B0'"
-          >チェック</button>
-        <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+        <a
+          href="https://game-i.daa.jp/?AppStore%E3%82%A2%E3%83%97%E3%83%AA%E6%9C%80%E6%96%B0%E3%82%BB%E3%83%BC%E3%83%AB%E3%82%B9%E3%83%A9%E3%83%B3%E3%82%AD%E3%83%B3%E3%82%B0'"
+          ><button type="button">チェック</button></a
+        >
+        <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br
+        /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br
+        />
       </div>
     </div>
-
+    <!-- 
     <h2>編集</h2>
 
     <table id="table_edit" align="center" width="500">
@@ -108,10 +106,11 @@
             <button
               class="deleteButton"
               on:click={() => {
-                items = items.slice(0, i).concat(items.slice(i + 1))
-                sumMoney = items.reduce((a, b) => a + b[1], 0)
-                $: store.set((sumMoney / maxMoney) * 100)
-              }}>🔥</button>
+                items = items.slice(0, i).concat(items.slice(i + 1));
+                sumMoney = items.reduce((a, b) => a + b[1], 0);
+                $: store.set((sumMoney / maxMoney) * 100);
+              }}>🔥</button
+            >
           </td>
         </tr>
       {/each}
@@ -124,22 +123,23 @@
 
     <script>
       editor.addEventListener("charge", function () {
-        console.log("aaa")
-      })
+        console.log("aaa");
+      });
     </script>
 
     <br />
     <form
       on:submit|preventDefault={() => {
         if (!formName || !formVal) {
-          alert("有効な値を入れてください。💩")
-          return
+          alert("有効な値を入れてください。💩");
+          return;
         }
-        items = [...items, [formName, formVal, selected ? selected.id : 0]]
-        sumMoney = items.reduce((a, b) => a + b[1], 0)
-        formName = formVal = selected = null
-        $: store.set((sumMoney / maxMoney) * 100)
-      }}>
+        items = [...items, [formName, formVal, selected ? selected.id : 0]];
+        sumMoney = items.reduce((a, b) => a + b[1], 0);
+        formName = formVal = selected = null;
+        $: store.set((sumMoney / maxMoney) * 100);
+      }}
+    >
       <input placeholder="項目名" bind:value={formName} />
       <input type="number" placeholder="金額を入力" bind:value={formVal} />
       <select bind:value={selected} on:change={() => (answer = "")}>
@@ -152,17 +152,17 @@
       <button type="submit">品目の追加</button>
     </form>
 
-    <Pie size={200} percent={$store} />
+    <Pie size={200} percent={$store} /> -->
   </body>
 </main>
 
 <style>
   /* main {
-    text-align: center;
-    padding: 1em;
-    max-width: 240px;
-    margin: 0 auto;
-  } */
+      text-align: center;
+      padding: 1em;
+      max-width: 240px;
+      margin: 0 auto;
+    } */
 
   /*///////////////////*/
   * {
@@ -247,15 +247,15 @@
     background: yellow; /* 後でスタイルいじる */
   }
   /* 
-  @media (min-width: 640px) {
-    main {
-      max-width: none;
+    @media (min-width: 640px) {
+      main {
+        max-width: none;
+      }
     }
-  }
-  #table_edit {
-    border-collapse: collapse;
-  }
-  #table_edit td {
-    border: 1px solid lightgray;
-  } */
+    #table_edit {
+      border-collapse: collapse;
+    }
+    #table_edit td {
+      border: 1px solid lightgray;
+    } */
 </style>
